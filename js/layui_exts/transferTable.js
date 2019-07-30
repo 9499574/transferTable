@@ -76,7 +76,8 @@ layui.define('table', function(exports){
       this.loadTable()
       // 移动数据
       this.moveData()
-	    
+	  // 监听双击事件 并移动数据
+	  this.doubleData()
 	 }
 
 	 Class.prototype.tableHtml = function(){
@@ -141,6 +142,7 @@ layui.define('table', function(exports){
             $('.'+that.rigth_table_id).addClass('layui-btn-disabled')
           }
       });
+
    }
    Class.prototype.moveData = function(){
       //绑定点击事件
@@ -150,39 +152,7 @@ layui.define('table', function(exports){
           if(!$(this).hasClass('layui-btn-disabled')){
             var checkStatus = table.checkStatus(that.reload_left)
             ,data = checkStatus.data;
-            if(data && data.length){
-                if(that.config.where && that.config.where[idName]){
-                    var id_data = that.config.where[idName];
-                    id_data = id_data.split(',')
-                }else{
-                    var id_data = [];
-                }
-               
-                $.each(data,function(k,v){
-                    id_data.push(''+v[idName])
-                })
-
-                //全局存储
-                id_data = $.unique(id_data);
-                var ids_str = id_data.join(',')
-                var d =  [];
-                var tableid = that.reload_right;
-                d[tableid] = {data:ids_str}
-                transferTable.set(d)
-                //配置存储ID
-                if(!that.config.where){
-                    that.config.where = {}
-                }
-                that.config.where[idName] = ids_str
-                //重载表格
-                var reload_config = {
-                  page:{curr:1},
-                  where:{}
-                }
-                reload_config.where[idName] = ids_str
-                table.reload(that.reload_left,reload_config)
-                table.reload(that.reload_right,reload_config)
-            }
+            that.leftReload(that,data)
           }
           $(this).addClass('layui-btn-disabled')
       })
@@ -190,39 +160,96 @@ layui.define('table', function(exports){
         if(!$(this).hasClass('layui-btn-disabled')){
           var checkStatus = table.checkStatus(that.reload_right)
             ,data = checkStatus.data;
-            if(data && data.length){
-                var sel_data = [];
-                $.each(data,function(k,v){
-                    sel_data.push(''+v[idName])
-                })
-                var id_data = that.config.where[idName];
-                    id_data = id_data.split(',');
-                var moveD = []; //移除后保留的ID集合
-                $.each(id_data,function(k,v){
-                    if($.inArray(v,sel_data) == -1) moveD.push(v)
-                })
-                id_data = $.unique(moveD);
-                var ids_str = id_data.join(',')
-                var d =  [];
-                var tableid = that.reload_right;
-                d[tableid] = {data:ids_str}
-                transferTable.set(d)
-                //配置存储ID
-                that.config.where[idName] = ids_str
-                //重载表格
-                var reload_config = {
-                  page:{curr:1},
-                  where:{}
-                }
-                reload_config.where[idName] = ids_str
-                table.reload(that.reload_left,reload_config)
-                table.reload(that.reload_right,reload_config)
-            }
+            that.rigthReload(that,data)
         }
         $(this).addClass('layui-btn-disabled')
       })
       
    }
+   Class.prototype.doubleData = function(){
+   	 var that = this;
+   	 
+   	 table.on('rowDouble('+that.left_table_id+')', function(obj){
+	  	//左边移动到右边
+	  	var data = [];
+	  	data.push(obj.data)
+	  	that.leftReload(that,data)
+	 });
+	 table.on('rowDouble('+that.rigth_table_id+')', function(obj){
+	 	//右边移动到左边
+	  	var data = [];
+	  	data.push(obj.data)
+	  	that.rigthReload(that,data)
+	 });
+   }
+
+   //重载表格
+  Class.prototype.leftReload = function (that,data){
+
+  	if(data && data.length){
+	    if(that.config.where && that.config.where[idName]){
+	        var id_data = that.config.where[idName];
+	        id_data = id_data.split(',')
+	    }else{
+	        var id_data = [];
+	    }
+	   
+	    $.each(data,function(k,v){
+	        id_data.push(''+v[idName])
+	    })
+
+	    //全局存储
+	    id_data = $.unique(id_data);
+	    var ids_str = id_data.join(',')
+	    var d =  [];
+	    var tableid = that.reload_right;
+	    d[tableid] = {data:ids_str}
+	    transferTable.set(d)
+	    //配置存储ID
+	    if(!that.config.where){
+	        that.config.where = {}
+	    }
+	    this.config.where[idName] = ids_str
+	    //重载表格
+	    var reload_config = {
+	      page:{curr:1},
+	      where:{}
+	    }
+	    reload_config.where[idName] = ids_str
+	    table.reload(that.reload_left,reload_config)
+	    table.reload(that.reload_right,reload_config)
+	}
+  }
+  Class.prototype.rigthReload = function(that,data){
+  	if(data && data.length){
+	    var sel_data = [];
+	    $.each(data,function(k,v){
+	        sel_data.push(''+v[idName])
+	    })
+	    var id_data = that.config.where[idName];
+	        id_data = id_data.split(',');
+	    var moveD = []; //移除后保留的ID集合
+	    $.each(id_data,function(k,v){
+	        if($.inArray(v,sel_data) == -1) moveD.push(v)
+	    })
+	    id_data = $.unique(moveD);
+	    var ids_str = id_data.join(',')
+	    var d =  [];
+	    var tableid = that.reload_right;
+	    d[tableid] = {data:ids_str}
+	    transferTable.set(d)
+	    //配置存储ID
+	    this.config.where[idName] = ids_str
+	    //重载表格
+	    var reload_config = {
+	      page:{curr:1},
+	      where:{}
+	    }
+	    reload_config.where[idName] = ids_str
+	    table.reload(that.reload_left,reload_config)
+	    table.reload(that.reload_right,reload_config)
+	}
+  }
 
   	transferTable.render = function(options){
 	    var ins = new Class(options);

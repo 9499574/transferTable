@@ -19,7 +19,7 @@
 			<input type="text" id="title" placeholder="用户名模糊搜索" class="layui-input">
 		</div>
 		<div class="layui-btn-group">
-			<button id="get" class="layui-btn">搜索</button>
+			<button id="reload" class="layui-btn">搜索</button>
 			<button id="submit" class="layui-btn">保存</button>
 		</div>
 	</div>
@@ -49,7 +49,7 @@
 				,id_name:'id'
 			})
 
-			$('#get').on('click',function(){
+			$('#reload').on('click',function(){
 				transferTable.reload('transferTable_1_1',{
 					page:{curr:1},
 					where:{

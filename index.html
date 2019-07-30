@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>transferTable</title>
+	<meta charset="utf-8">
+	<link rel="stylesheet" type="text/css" href="js/layui/css/layui.css">
+	<script type="text/javascript" src="js/layui/layui.js"></script>
+</head>
+<body>
+	<div class="layui-form">
+		<div class="layui-input-inline">
+			<select id="sex">
+				<option value="">全部性别</option>
+				<option value="1">男</option>
+				<option value="2">女</option>
+			</select>
+		</div>
+		<div class="layui-input-inline">
+			<input type="text" id="title" placeholder="用户名模糊搜索" class="layui-input">
+		</div>
+		<div class="layui-btn-group">
+			<button id="get" class="layui-btn">搜索</button>
+			<button id="submit" class="layui-btn">保存</button>
+		</div>
+	</div>
+	
+	<div id="transferTable"></div>
+
+	<script type="text/javascript">
+		layui.config({
+			base:'js/layui_exts/'
+		}).use('transferTable', function(){
+			var transferTable = layui.transferTable,$=layui.$;
+			var cols = [
+					{checkbox: true, fixed: true}
+					,{field:'id', title: 'ID'} 
+					,{field:'username', title: '用户名'}
+					,{field:'sex', title: '性别'}
+					]
+
+			transferTable.render({
+				elem: '#transferTable'
+				,url: ['api.php?t=1','api.php?t=2']
+				,cols: [[cols],[cols]]
+				,page: [true,true]
+				,id:['transferTable_1_1','transferTable_2_2']
+				,height:[500,500]
+				,where:{id:'1,2,3'}
+				,id_name:'id'
+			})
+
+			$('#get').on('click',function(){
+				transferTable.reload('transferTable_1_1',{
+					page:{curr:1},
+					where:{
+						title: $('#title').val(),
+						sex: $('#sex').val()
+					}
+				})
+			})
+
+			$('#submit').on('click',function(){
+				var id = transferTable.get('transferTable_2_2');
+				layer.msg(JSON.stringify(id));
+			})
+		
+		})
+	</script>
+</body>
+</html>

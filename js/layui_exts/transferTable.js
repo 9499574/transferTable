@@ -105,13 +105,17 @@ layui.define('table', function(exports){
       $.each(lt,function(k,id){
           var config = {elem: '#'+id}
           $.each(options,function(key,val){
+          	
             if(val[k] || val[k]===false){
               var value = val[k]
             }else{
               var value = val[0]
             }
-            
-            if(key !== 'elem' && key !== 'id_name' && key !== 'where') config[key] = value
+            if(typeof val == 'function'){
+            	config[key] = options[key]
+            }else if(key !== 'elem' && key !== 'id_name' && key !== 'where') {
+            	config[key] = value
+            }
           })
           if(options.where){config.where = options.where}
           table.render(config);

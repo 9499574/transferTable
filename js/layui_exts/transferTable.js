@@ -192,7 +192,7 @@ layui.define('table', function(exports){
 
   	if(data && data.length){
 	    if(that.config.where && that.config.where[idName]){
-	        var id_data = that.config.where[idName];
+	        var id_data = that.config.where[idName]+"";
 	        id_data = id_data.split(',')
 	    }else{
 	        var id_data = [];
@@ -230,7 +230,7 @@ layui.define('table', function(exports){
 	    $.each(data,function(k,v){
 	        sel_data.push(''+v[idName])
 	    })
-	    var id_data = that.config.where[idName];
+	    var id_data = that.config.where[idName]+"";
 	        id_data = id_data.split(',');
 	    var moveD = []; //移除后保留的ID集合
 	    $.each(id_data,function(k,v){
